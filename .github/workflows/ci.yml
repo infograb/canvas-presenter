@@ -55,7 +55,7 @@ jobs:
           tar -xzf "dist/release/canvas-presenter-v${version}.tar.gz" -C dist/smoke
           root="dist/smoke/canvas-presenter-v${version}"
           node "$root/scripts/canvas.mjs" validate "$root/assets/examples/grouped.json"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: public-build
           path: |
@@ -92,7 +92,7 @@ jobs:
             http://127.0.0.1:4177 \
             dist/browser-qa \
             dist/site
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: browser-qa
