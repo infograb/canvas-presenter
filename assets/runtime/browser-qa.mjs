@@ -171,8 +171,9 @@ try {
   await page.waitForFunction(()=>document.querySelector('.app')?.dataset.slideshow==='false');
  });
  await check('header composition, fullscreen and notes',async()=>{
-  await page.waitForFunction(()=>[...document.querySelectorAll('.header-actions button')].map(b=>b.textContent).join('|')==='목차 숨기기|전체화면|슬라이드 쇼|단축키');
-  assert.deepEqual(await page.locator('.header-actions button').allInnerTexts(),['목차 숨기기','전체화면','슬라이드 쇼','단축키']);
+  await page.waitForFunction(()=>{const labels=[...document.querySelectorAll('.header-actions button')].map(b=>b.textContent);
+   return labels.length===5&&labels[0]==='목차 숨기기'&&labels[1]==='전체화면'&&labels[2]==='슬라이드 쇼'&&labels[4]==='단축키';});
+  assert.equal(await page.locator('[data-theme-toggle]').count(),1,'the theme toggle sits between the slideshow and the shortcut button');
   await page.getByRole('button',{name:'전체화면 전환 (F)',exact:true}).click();
   // 전체화면은 허용될 수도 거부될 수도 있다. 어느 쪽이든 관측될 때까지 기다린 뒤 그 결과로 분기한다.
   await page.waitForFunction(()=>document.querySelector('[aria-label="전체화면 전환 (F)"]')?.getAttribute('aria-pressed')==='true'||document.body.innerText.includes('전체화면 요청을 허용하지 않았습니다'));
@@ -182,6 +183,42 @@ try {
   }
   await page.getByRole('button',{name:'노트',exact:true}).click();assert.equal(await page.locator('.notes-panel').count(),1);
   await page.getByRole('button',{name:'노트 닫기',exact:true}).click();
+ });
+ await check('theme follows the system, can be overridden, and keeps slide colors',async()=>{
+  const read=async()=>page.evaluate(()=>{
+   const root=document.documentElement,style=getComputedStyle(root),mm=document.querySelector('.react-flow__minimap');
+   return{
+    mode:root.dataset.theme??'auto',
+    label:document.querySelector('[data-theme-toggle]').textContent,
+    surface:style.getPropertyValue('--surface').trim(),
+    header:getComputedStyle(document.querySelector('.app-header')).backgroundColor,
+    mask:mm.getAttribute('style').match(/mask-background-color-props: ([^;]+)/)[1].trim(),
+    slide:getComputedStyle(document.querySelector('.slide-card')).backgroundColor,
+   };
+  });
+  await page.emulateMedia({colorScheme:'dark',reducedMotion:'reduce'});
+  const auto=await read();
+  assert.equal(auto.mode,'auto');
+  assert.equal(auto.surface,'#0E1A20','auto must follow the system preference');
+  await page.getByRole('button',{name:/화면 모드/}).click();
+  const forcedLight=await read();
+  assert.equal(forcedLight.mode,'light','an explicit choice overrides the system preference');
+  assert.equal(forcedLight.surface,'#F7FAF8');
+  await page.keyboard.press('KeyA');
+  const forcedDark=await read();
+  assert.equal(forcedDark.mode,'dark');
+  assert.notEqual(forcedDark.mask,forcedLight.mask,'the minimap mask must follow the theme');
+  assert.notEqual(forcedDark.header,forcedLight.header);
+  assert.equal(forcedDark.slide,forcedLight.slide,'slide surfaces are user content and must not be recolored');
+  await page.addScriptTag({path:path.join(root,'node_modules/axe-core/axe.min.js')});
+  const dark=await page.evaluate(async()=>await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}));
+  const violations=dark.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}));
+  await fs.writeFile(path.join(output,'axe-dark.json'),JSON.stringify({violations,incomplete:dark.incomplete.map(v=>v.id)},null,2));
+  assert.equal(violations.length,0,JSON.stringify(violations));
+  await shot('dark-overview-1920x1080-2x');
+  await page.keyboard.press('KeyA');
+  assert.equal((await read()).mode,'auto','the cycle returns to auto');
+  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
  });
  await check('help traps focus, Escape does not reset the scene',async()=>{
   const focus=await attr('data-focused');await page.getByRole('button',{name:'키보드 단축키 (?)',exact:true}).click();

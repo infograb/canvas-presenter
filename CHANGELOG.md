@@ -8,6 +8,24 @@
 
 - 아직 공개되지 않은 변경 사항이 없습니다.
 
+## [2.1.0] - 2026-09-11
+
+### Added
+
+- 캔버스 화면의 어두운 모드. 기본은 운영체제 `prefers-color-scheme`을 따르는 자동이고, 헤더 버튼과 `A`로 자동 → 밝게 → 어둡게를 돌린다. 자동이 아닌 선택은 `localStorage`에 남고, 저장이 막히면 조용히 자동으로 돌아간다
+- 두 모드의 팔레트를 담는 `:root` 토큰 한 벌. 캔버스 화면의 색 리터럴을 전부 토큰으로 옮겼다
+- 매니페스트의 그룹 `color`에서 테마별로 계산하는 `--group-ink`·`--group-border`·`--group-fill`. 밝은 배경을 전제로 고른 짙은 색도 어두운 모드에서 대비 4.5:1을 넘긴다
+- 어두운 모드의 axe 검사와 화면 모드 전환을 확인하는 브라우저 QA 시나리오
+
+### Fixed
+
+- `--brand-wash` 위의 글자가 두 모드 모두 대비 4.5:1을 넘기지 못했다. `발표 경로 복귀`, 목차의 현재 항목, 눌린 버튼이 이에 해당한다
+- 미니맵과 배경 점의 색을 `requestAnimationFrame` 안에서 읽던 탓에 백그라운드 탭에서 열면 테마가 반영되지 않았다
+
+### Changed
+
+- 슬라이드와 그 배경은 화면 모드와 무관하게 그대로 둔다. `--slide-backdrop`은 두 모드 모두 흰색이다. 슬라이드 쇼도 두 모드에서 모두 어둡다
+
 ## [2.0.1] - 2026-09-11
 
 ### Security
@@ -124,7 +142,8 @@
 
 - 로컬 자산 인라인, 경로 이탈·외부 참조 거부, 제한적인 CSP와 sandbox iframe 적용
 
-[Unreleased]: https://github.com/infograb/canvas-presenter/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/infograb/canvas-presenter/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/infograb/canvas-presenter/releases/tag/v2.1.0
 [2.0.1]: https://github.com/infograb/canvas-presenter/releases/tag/v2.0.1
 [2.0.0]: https://github.com/infograb/canvas-presenter/releases/tag/v2.0.0
 [1.2.0]: https://github.com/infograb/canvas-presenter/releases/tag/v1.2.0

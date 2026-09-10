@@ -180,6 +180,19 @@ function readInitial(){
   return {path:path.id,step,focus:focus&&Object.hasOwn(payload.boundsById,focus)?focus:fallbackFocus};
 }
 const initial = readInitial();
+const THEME_KEY='canvas-presenter-theme';
+const THEME_MODES=['auto','light','dark'];
+const THEME_LABEL={auto:'화면 자동',light:'밝게',dark:'어둡게'};
+function readTheme(){
+ try{const stored=localStorage.getItem(THEME_KEY);if(THEME_MODES.includes(stored))return stored;}catch{}
+ return 'auto';
+}
+// 미니맵과 배경 점은 React가 색을 넘겨야 한다. 값은 CSS 토큰 하나에서만 읽는다.
+function readThemeColors(){
+ const style=getComputedStyle(document.documentElement);
+ const token=name=>style.getPropertyValue(name).trim();
+ return {grid:token('--grid'),frame:token('--minimap-frame'),node:token('--minimap-node'),active:token('--brand'),stroke:token('--muted'),mask:token('--minimap-mask')};
+}
 
 function Player(){
   const rf = useReactFlow();
@@ -196,6 +209,8 @@ function Player(){
   const [direct,setDirect] = useState(false);
   const [cameraDirty,setCameraDirty] = useState(false);
   const [reduced,setReduced] = useState(matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [theme,setTheme] = useState(readTheme);
+  const [themeColors,setThemeColors] = useState(readThemeColors);
   const [notice,setNotice] = useState('');
   const path = payload.paths.find(p=>p.id===pathId);
   const step = cursor>=0 ? path.steps[cursor] : null;
@@ -208,6 +223,17 @@ function Player(){
   const firstFit = useRef(false);
   const pressAt = useRef(null);
   const refit = useRef(()=>{});
+  useEffect(()=>{
+    const root=document.documentElement;
+    if(theme==='auto') delete root.dataset.theme; else root.dataset.theme=theme;
+    try{if(theme==='auto')localStorage.removeItem(THEME_KEY);else localStorage.setItem(THEME_KEY,theme);}catch{}
+    // 속성을 바꾼 직후 계산된 값은 이미 새 테마이다. rAF로 미루면 백그라운드 탭에서 영영 오지 않는다.
+    const sync=()=>setThemeColors(readThemeColors());
+    sync();
+    const media=matchMedia('(prefers-color-scheme: dark)');
+    media.addEventListener('change',sync);
+    return ()=>media.removeEventListener('change',sync);
+  },[theme]);
   const focus = useCallback((id,duration=450,keepInteraction=false)=>{
     const target = id===payload.tree.id?'overview':id;
     if(!Object.hasOwn(payload.boundsById,target)) return;
@@ -272,7 +298,7 @@ function Player(){
   const onMoveStart = useCallback(event=>{if(event)setCameraDirty(true);},[]);
   const dirtyCamera = useCallback(()=>setCameraDirty(true),[]);
   const paneClick = useCallback(()=>setDirect(false),[]);
-  const minimapNodeColor = useCallback(node=>node.type==='frame'?'#EAF2EE':focused===node.id?'#116B5E':'#94BBA9',[focused]);
+  const minimapNodeColor = useCallback(node=>node.type==='frame'?themeColors.frame:focused===node.id?themeColors.active:themeColors.node,[focused,themeColors]);
   const minimapNodeClick = useCallback((_,node)=>focus(node.id),[focus]);
 
   useEffect(()=>{
@@ -386,6 +412,7 @@ function Player(){
       else if(key==='m'){event.preventDefault();setMinimap(v=>!v);}
       else if(key==='n'){event.preventDefault();setNotes(v=>!v);}
       else if(key==='f'){event.preventDefault();fullScreen();}
+      else if(key==='a'){event.preventDefault();setTheme(current=>THEME_MODES[(THEME_MODES.indexOf(current)+1)%THEME_MODES.length]);}
       else if(key==='+'||key==='='){event.preventDefault();setCameraDirty(true);rf.zoomIn({duration:reduced?0:180});}
       else if(key==='-'){event.preventDefault();setCameraDirty(true);rf.zoomOut({duration:reduced?0:180});}
       else if(key==='?'){event.preventDefault();setHelp(true);} 
@@ -417,6 +444,7 @@ function Player(){
         {button(outline?'목차 숨기기':'목차 보기',()=>setOutline(v=>!v),{'aria-pressed':outline,className:'outline-toggle'})}
         {button(fullscreen?'전체화면 종료':'전체화면',fullScreen,{'aria-label':'전체화면 전환 (F)','aria-pressed':fullscreen})}
         {button('슬라이드 쇼',startSlideshow,{'aria-label':'전체 화면 슬라이드 쇼 시작 (S)','aria-pressed':slideshow,'data-slideshow-toggle':true,className:'primary'})}
+        {button(THEME_LABEL[theme],()=>setTheme(current=>THEME_MODES[(THEME_MODES.indexOf(current)+1)%THEME_MODES.length]),{'aria-label':`화면 모드: ${THEME_LABEL[theme]} (A)`,'data-theme-toggle':true,title:'화면 모드를 자동·밝게·어둡게로 바꿉니다 (A)'})}
         {button('단축키',()=>setHelp(v=>!v),{'aria-haspopup':'dialog','aria-label':'키보드 단축키 (?)','data-help-toggle':true})}
       </div>
     </header>
@@ -430,8 +458,8 @@ function Player(){
       <main className="stage" ref={stageRef} aria-label="확대 축소 발표 캔버스" onPointerDownCapture={event=>{pressAt.current={x:event.clientX,y:event.clientY};}}>
         <nav className="breadcrumb" aria-label="현재 위치">{button('전체',()=>focus('overview'))}{ancestors.map(item=><React.Fragment key={item.id}><span aria-hidden="true">/</span>{button(item.title,()=>focus(item.id))}</React.Fragment>)}</nav>
         <ReactFlow proOptions={proOptions} onInit={onInit} onMoveStart={onMoveStart} nodes={nodes} edges={edges} nodeTypes={nodeTypes} minZoom={0.025} maxZoom={4} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} deleteKeyCode={null} selectionKeyCode={null} multiSelectionKeyCode={null} panOnDrag zoomOnScroll zoomOnPinch zoomOnDoubleClick={false} onlyRenderVisibleElements onNodeClick={nodeClick} onPaneClick={paneClick} preventScrolling aria-label="슬라이드와 그룹을 배치한 캔버스">
-          <Background color="#CEDDD6" gap={28} size={1.2}/>
-          {minimap&&<div onPointerDown={dirtyCamera} onWheel={dirtyCamera}><MiniMap pannable zoomable ariaLabel="발표 미니맵: 드래그로 이동하고 휠로 확대합니다" nodeColor={minimapNodeColor} nodeStrokeColor="#526B73" nodeStrokeWidth={1.5} maskColor="rgba(247,250,248,.72)" maskStrokeColor="#116B5E" maskStrokeWidth={2} onNodeClick={minimapNodeClick}/></div>}
+          <Background color={themeColors.grid} gap={28} size={1.2}/>
+          {minimap&&<div onPointerDown={dirtyCamera} onWheel={dirtyCamera}><MiniMap pannable zoomable ariaLabel="발표 미니맵: 드래그로 이동하고 휠로 확대합니다" nodeColor={minimapNodeColor} nodeStrokeColor={themeColors.stroke} nodeStrokeWidth={1.5} maskColor={themeColors.mask} maskStrokeColor={themeColors.active} maskStrokeWidth={2} onNodeClick={minimapNodeClick}/></div>}
         </ReactFlow>
         <div className="camera-controls" role="toolbar" aria-label="카메라 조작">
           {button('+',()=>{setCameraDirty(true);rf.zoomIn({duration:reduced?0:180});},{'aria-label':'확대'})}
@@ -451,7 +479,7 @@ function Player(){
       <div className="path-controls">{button('이전',()=>go(cursor-1),{disabled:cursor<=0,'aria-label':'이전 슬라이드','title':'이전 슬라이드 (←, ↑, Page Up, K)'})}<span className="step-status" role="status" aria-live="polite" aria-label={statusLabel}>{statusText}</span>{button('다음',()=>go(cursor+1),{disabled:cursor>=path.steps.length-1,'aria-label':'다음 슬라이드','title':'다음 슬라이드 (→, ↓, Page Down, Space, J)',className:'primary'})}</div>
       <div className="footer-actions">{button('발표 경로 복귀',()=>focus(step?.target ?? 'overview'),{className:detour?'resume':'',title:'현재 발표 슬라이드로 복귀 (R)'})}{button('노트',()=>setNotes(v=>!v),{'aria-pressed':notes})}<label className="reduce-motion"><input type="checkbox" checked={reduced} onChange={event=>setReduced(event.target.checked)}/>모션 줄이기</label></div>
     </footer>
-    {help&&<div className="help-backdrop" onClick={()=>setHelp(false)}><section className="help-dialog" role="dialog" aria-modal="true" aria-label="키보드 단축키" onClick={event=>event.stopPropagation()}><h2>키보드 단축키</h2><p>이전·다음은 그룹이나 전체보기를 거치지 않고 현재 발표 경로의 슬라이드 사이에서만 이동합니다. 전체 윤곽과 그룹은 탐색용 보기입니다.</p><dl><dt>→ · ↓ · Page Down · Space · J · L</dt><dd>다음 슬라이드</dd><dt>← · ↑ · Page Up · Shift+Space · K · H</dt><dd>이전 슬라이드</dd><dt>1~9 · End</dt><dd>해당 번호 슬라이드 · 마지막 슬라이드</dd><dt>0 · O · Home</dt><dd>전체 윤곽</dd><dt>U · R</dt><dd>상위 그룹 · 현재 발표 슬라이드로 복귀</dd><dt>+ · −</dt><dd>확대 · 축소</dd><dt>F · S · T · M · N</dt><dd>전체화면 · 슬라이드 쇼 · 목차 · 미니맵 · 노트</dd><dt>C</dt><dd>슬라이드 쇼에서 HTML 슬라이드 직접 조작 전환</dd><dt>? · Escape</dt><dd>단축키 열기 · 현재 모드 닫기</dd></dl><p>슬라이드 쇼가 발표 화면입니다. 슬라이드가 화면을 가득 채우고 막대만 아래에 겹칩니다. 마우스를 움직이면 레이저 점이 따라오고 멈추면 사라집니다. 끌면 강조 상자가 그려지고, 한 번 누르면 지워집니다. 장을 넘겨도 지워집니다. HTML 슬라이드를 마우스로 다루려면 직접 조작을 켜세요.</p><p>슬라이드 쇼는 현재 슬라이드에서 시작하고, 시작 전에는 첫 슬라이드부터 재생합니다. 이동은 방향키·Space·번호 키로 하고 Escape 또는 S로 종료합니다.</p><p>목차나 캔버스의 카드를 누르면 발표 순서를 바꾸지 않고 자유롭게 탐색합니다. 캔버스에서는 HTML을 선택한 슬라이드 하나만 실행합니다. 직접 조작 중에는 슬라이드가 키보드 입력을 받으므로 화면의 조작 종료 버튼을 사용하세요.</p><p>이 도구는 발표용입니다. 위치와 그룹은 구조 JSON에서 바꾸며, 슬라이드 자체를 편집하거나 PDF로 변환하지 않습니다.</p>{button('단축키 닫기',()=>setHelp(false),{className:'primary'})}</section></div>}
+    {help&&<div className="help-backdrop" onClick={()=>setHelp(false)}><section className="help-dialog" role="dialog" aria-modal="true" aria-label="키보드 단축키" onClick={event=>event.stopPropagation()}><h2>키보드 단축키</h2><p>이전·다음은 그룹이나 전체보기를 거치지 않고 현재 발표 경로의 슬라이드 사이에서만 이동합니다. 전체 윤곽과 그룹은 탐색용 보기입니다.</p><dl><dt>→ · ↓ · Page Down · Space · J · L</dt><dd>다음 슬라이드</dd><dt>← · ↑ · Page Up · Shift+Space · K · H</dt><dd>이전 슬라이드</dd><dt>1~9 · End</dt><dd>해당 번호 슬라이드 · 마지막 슬라이드</dd><dt>0 · O · Home</dt><dd>전체 윤곽</dd><dt>U · R</dt><dd>상위 그룹 · 현재 발표 슬라이드로 복귀</dd><dt>+ · −</dt><dd>확대 · 축소</dd><dt>F · S · T · M · N</dt><dd>전체화면 · 슬라이드 쇼 · 목차 · 미니맵 · 노트</dd><dt>A</dt><dd>화면 모드: 자동 · 밝게 · 어둡게</dd><dt>C</dt><dd>슬라이드 쇼에서 HTML 슬라이드 직접 조작 전환</dd><dt>? · Escape</dt><dd>단축키 열기 · 현재 모드 닫기</dd></dl><p>슬라이드 쇼가 발표 화면입니다. 슬라이드가 화면을 가득 채우고 막대만 아래에 겹칩니다. 마우스를 움직이면 레이저 점이 따라오고 멈추면 사라집니다. 끌면 강조 상자가 그려지고, 한 번 누르면 지워집니다. 장을 넘겨도 지워집니다. HTML 슬라이드를 마우스로 다루려면 직접 조작을 켜세요.</p><p>슬라이드 쇼는 현재 슬라이드에서 시작하고, 시작 전에는 첫 슬라이드부터 재생합니다. 이동은 방향키·Space·번호 키로 하고 Escape 또는 S로 종료합니다.</p><p>목차나 캔버스의 카드를 누르면 발표 순서를 바꾸지 않고 자유롭게 탐색합니다. 캔버스에서는 HTML을 선택한 슬라이드 하나만 실행합니다. 직접 조작 중에는 슬라이드가 키보드 입력을 받으므로 화면의 조작 종료 버튼을 사용하세요.</p><p>이 도구는 발표용입니다. 위치와 그룹은 구조 JSON에서 바꾸며, 슬라이드 자체를 편집하거나 PDF로 변환하지 않습니다.</p>{button('단축키 닫기',()=>setHelp(false),{className:'primary'})}</section></div>}
   </div>
   {slideshow&&<Slideshow slide={slideshowSlide} cursor={cursor} total={path.steps.length} onExit={exitSlideshow} notice={notice} onDismissNotice={()=>setNotice('')} containerRef={slideshowRef} help={help} direct={direct} onDirect={setDirect}/>}
   </></Session.Provider>;
