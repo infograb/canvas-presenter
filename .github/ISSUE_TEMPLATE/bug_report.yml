@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a reproducible Canvas Presenter problem
+title: '[Bug]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report security vulnerabilities or include private slide content here. Use SECURITY.md for private reports.
+  - type: input
+    id: version
+    attributes:
+      label: Canvas Presenter version
+      description: Release tag or commit SHA
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, CPU architecture, Node.js version, browser name and version
+      placeholder: macOS arm64, Node 24, Chrome 140
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Commands, a redacted manifest and the smallest non-sensitive assets needed to reproduce the problem
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and logs
+      description: Paste the complete error after removing secrets, customer data and local private paths
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I removed secrets, customer data and personal information.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

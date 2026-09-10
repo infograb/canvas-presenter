@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: node scripts/version.mjs check --tag "$GITHUB_REF_NAME"
+      - run: npm run verify
+      - run: npm run check:generated
+      - run: git diff --exit-code
+      - run: npm run release:pack -- --out dist/release --ref "$GITHUB_REF_NAME"
+      - name: Publish immutable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/release/*
+          --verify-tag
+          --generate-notes
+          --title "Canvas Presenter $GITHUB_REF_NAME"

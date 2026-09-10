@@ -1,0 +1,52 @@
+{
+  "name": "@infograb/canvas-presenter",
+  "version": "2.0.1",
+  "description": "Package SVG, PNG, and HTML slides as an offline zoomable presentation canvas and Aside skill.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "InfoGrab",
+  "homepage": "https://infograb.github.io/canvas-presenter/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infograb/canvas-presenter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/infograb/canvas-presenter/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "canvas-presenter": "scripts/canvas.mjs"
+  },
+  "scripts": {
+    "build:runtime": "node assets/runtime/build.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "test": "node --test scripts/tests/*.test.mjs",
+    "validate:examples": "node scripts/validate-examples.mjs",
+    "version:check": "node scripts/version.mjs check",
+    "version:set": "node scripts/version.mjs set",
+    "check:generated": "node scripts/check-generated.mjs",
+    "audit:repo": "node scripts/audit-repository.mjs",
+    "verify": "npm test && npm run validate:examples && npm run version:check && npm run audit:repo",
+    "release:pack": "node scripts/package-release.mjs"
+  },
+  "keywords": [
+    "aside-skill",
+    "presentation",
+    "canvas",
+    "react-flow",
+    "offline"
+  ],
+  "dependencies": {
+    "@xyflow/react": "12.11.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "axe-core": "4.13.0",
+    "esbuild": "0.28.2",
+    "playwright-core": "1.63.0"
+  }
+}

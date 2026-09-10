@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+ <title id="title">미디어는 그대로 보여 줍니다</title><desc id="desc">원본 화면 비율을 유지하는 미디어 컨테이너의 시각 예시</desc><rect width="1920" height="1080" fill="#102731"/>
+ <text x="130" y="155" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="82" font-weight="700">미디어는 그대로 보여 줍니다</text><text x="130" y="226" fill="#BFD8D1" font-family="Arial, sans-serif" font-size="40">원본의 화면 비율을 보존하고, 캔버스에서 맥락을 제공합니다.</text>
+ <rect x="130" y="326" width="1060" height="596" rx="32" fill="#F7FAF8"/><rect x="174" y="370" width="972" height="508" rx="16" fill="#E0EEE9"/>
+ <circle cx="350" cy="555" r="98" fill="#116B5E"/><rect x="505" y="452" width="510" height="45" rx="22" fill="#102731"/><rect x="505" y="538" width="420" height="28" rx="14" fill="#789A94"/><rect x="505" y="600" width="465" height="28" rx="14" fill="#789A94"/><rect x="505" y="695" width="260" height="74" rx="37" fill="#A84A1A"/><text x="635" y="745" text-anchor="middle" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="36" font-weight="700">원본 장면</text>
+ <path d="M1325 425 H1750 M1325 570 H1680 M1325 715 H1615" stroke="#BFD8D1" stroke-width="9" stroke-linecap="round"/><circle cx="1275" cy="425" r="27" fill="#A84A1A"/><circle cx="1275" cy="570" r="27" fill="#116B5E"/><circle cx="1275" cy="715" r="27" fill="#F7FAF8"/>
+ <text x="1325" y="492" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="40">원본 비율</text><text x="1325" y="637" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="40">발표 맥락</text><text x="1325" y="782" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="40">설명 메모</text>
+ <text x="130" y="1008" fill="#BFD8D1" font-family="Arial, sans-serif" font-size="36">이 파일은 PNG 변환용 자체 제작 SVG 원본입니다.</text>
+</svg>

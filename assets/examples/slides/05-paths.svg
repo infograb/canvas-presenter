@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+ <title id="title">설명 경로를 여러 개 둡니다</title><desc id="desc">기본 설명, 질문 중심, 빠른 둘러보기라는 세 가지 발표 경로</desc><rect width="1920" height="1080" fill="#F7FAF8"/>
+ <text x="130" y="154" fill="#102731" font-family="Arial, sans-serif" font-size="82" font-weight="700">설명 경로를 여러 개 둡니다</text><text x="130" y="225" fill="#35535A" font-family="Arial, sans-serif" font-size="40">청중의 질문과 시간에 맞춰 같은 자료를 다르게 안내합니다.</text>
+ <path d="M345 480 H810 V640 H1170 V795 H1600" fill="none" stroke="#116B5E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M345 480 H810 V365 H1430" fill="none" stroke="#A84A1A" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M345 480 H590 V895 H1600" fill="none" stroke="#102731" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle cx="345" cy="480" r="80" fill="#102731"/><text x="345" y="494" text-anchor="middle" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="36" font-weight="700">시작</text>
+ <rect x="1360" y="290" width="400" height="150" rx="24" fill="#FFF0E8" stroke="#A84A1A" stroke-width="4"/><text x="1400" y="350" fill="#A84A1A" font-family="Arial, sans-serif" font-size="42" font-weight="700">빠른 둘러보기</text><text x="1400" y="407" fill="#35535A" font-family="Arial, sans-serif" font-size="36">시간이 짧을 때</text>
+ <rect x="1090" y="565" width="400" height="150" rx="24" fill="#E0EEE9" stroke="#116B5E" stroke-width="4"/><text x="1130" y="625" fill="#116B5E" font-family="Arial, sans-serif" font-size="42" font-weight="700">기본 설명</text><text x="1130" y="682" fill="#35535A" font-family="Arial, sans-serif" font-size="36">맥락부터 따라가기</text>
+ <rect x="1360" y="820" width="400" height="150" rx="24" fill="#E9EFF0" stroke="#102731" stroke-width="4"/><text x="1400" y="880" fill="#102731" font-family="Arial, sans-serif" font-size="42" font-weight="700">질문 중심</text><text x="1400" y="937" fill="#35535A" font-family="Arial, sans-serif" font-size="36">관심 장면부터 보기</text>
+</svg>

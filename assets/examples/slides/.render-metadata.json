@@ -1,0 +1,8 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "deviceScaleFactor": 1,
+  "browser": "Chromium-based browser selected by BROWSER_BIN or platform lookup"
+}

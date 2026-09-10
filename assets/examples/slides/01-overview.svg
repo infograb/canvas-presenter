@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">발표는 한 장씩만 넘기지 않습니다</title><desc id="desc">연결된 여섯 장의 슬라이드와 발표 흐름을 보여 주는 안내 화면</desc>
+  <rect width="1920" height="1080" fill="#F7FAF8"/>
+  <rect x="100" y="92" width="14" height="132" rx="7" fill="#A84A1A"/>
+  <text x="148" y="160" fill="#102731" font-family="Arial, sans-serif" font-size="82" font-weight="700">발표는 한 장씩만 넘기지 않습니다</text>
+  <text x="148" y="232" fill="#35535A" font-family="Arial, sans-serif" font-size="40">자료의 구조를 먼저 보고, 필요한 장면으로 들어갑니다.</text>
+  <path d="M320 635 H680 M900 635 H1260 M1480 635 H1650" stroke="#116B5E" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="260" cy="635" r="86" fill="#116B5E"/><text x="260" y="650" text-anchor="middle" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="38" font-weight="700">전체</text>
+  <rect x="600" y="493" width="380" height="284" rx="28" fill="#E0EEE9" stroke="#116B5E" stroke-width="5"/>
+  <text x="650" y="586" fill="#102731" font-family="Arial, sans-serif" font-size="46" font-weight="700">구조 확인</text><text x="650" y="655" fill="#35535A" font-family="Arial, sans-serif" font-size="38">묶음과 관계를</text><text x="650" y="705" fill="#35535A" font-family="Arial, sans-serif" font-size="38">한 화면에서 봅니다</text>
+  <rect x="1180" y="493" width="380" height="284" rx="28" fill="#FFF0E8" stroke="#A84A1A" stroke-width="5"/>
+  <text x="1230" y="586" fill="#102731" font-family="Arial, sans-serif" font-size="46" font-weight="700">장면 확대</text><text x="1230" y="655" fill="#35535A" font-family="Arial, sans-serif" font-size="38">설명할 대상에</text><text x="1230" y="705" fill="#35535A" font-family="Arial, sans-serif" font-size="38">집중할 수 있습니다</text>
+  <circle cx="1710" cy="635" r="86" fill="#A84A1A"/><text x="1710" y="650" text-anchor="middle" fill="#F7FAF8" font-family="Arial, sans-serif" font-size="38" font-weight="700">경로</text>
+  <text x="148" y="938" fill="#116B5E" font-family="Arial, sans-serif" font-size="46" font-weight="700">미디어 컨테이너 데모</text><text x="148" y="1000" fill="#35535A" font-family="Arial, sans-serif" font-size="36">사용자의 자료를 특정 형식으로 강제하는 템플릿이 아닙니다.</text>
+</svg>

@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose a user-centered, backward-compatible improvement
+title: '[Feature]: '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Describe the blocked moment, audience and current workaround rather than only naming a feature.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected behavior
+      description: What should change for the user, and how would we verify it?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: compatibility
+    attributes:
+      label: Compatibility impact
+      options:
+        - No manifest or CLI change
+        - Backward-compatible schema or CLI addition
+        - Potential breaking change
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security, privacy and licensing impact
+      description: Mention HTML execution, external resources, third-party assets or new dependencies.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and proposals.
+          required: true
+        - label: I did not include private slide content or credentials.
+          required: true

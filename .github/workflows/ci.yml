@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, Node ${{ matrix.node }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [20, 22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run verify
+
+  generated:
+    name: generated and release package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check:generated
+      - run: git diff --exit-code
+      - run: npm run build:site
+      - run: npm run release:pack -- --out dist/release --ref HEAD
+      - name: Smoke-test release archive
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          mkdir -p dist/smoke
+          tar -xzf "dist/release/canvas-presenter-v${version}.tar.gz" -C dist/smoke
+          root="dist/smoke/canvas-presenter-v${version}"
+          node "$root/scripts/canvas.mjs" validate "$root/assets/examples/grouped.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-build
+          path: |
+            dist/site
+            dist/release
+
+  browser:
+    name: browser
+    needs: generated
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:site
+      - name: Locate Chrome
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$browser"
+          echo "BROWSER_BIN=$browser" >> "$GITHUB_ENV"
+      - name: Run browser QA
+        shell: bash
+        run: |
+          mkdir -p dist/browser-qa
+          node scripts/canvas.mjs serve dist/site --port 4177 >dist/browser-qa/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          node -e "let last; for(let i=0;i<40;i++){try{const r=await fetch('http://127.0.0.1:4177/');if(r.ok)process.exit(0);last=new Error('HTTP '+r.status)}catch(e){last=e}await new Promise(r=>setTimeout(r,100))}throw last"
+          node assets/runtime/browser-qa.mjs \
+            http://127.0.0.1:4177 \
+            dist/browser-qa \
+            dist/site
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-qa
+          path: dist/browser-qa

@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+assets/runtime/player.js linguist-generated=true
+assets/runtime/player.css linguist-generated=true
+assets/runtime/THIRD-PARTY-NOTICES.txt linguist-generated=true
